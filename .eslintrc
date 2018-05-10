@@ -1,0 +1,14 @@
+{
+  "parser": "babel-eslint",
+  "plugins": ["node", "import"],
+  "extends": ["eslint:recommended", "plugin:node/recommended"],
+  "env": {
+    "node": true,
+    "es6": true,
+    "mongo": true,
+    "mocha": true
+  },
+  "rules": {
+    "node/no-unsupported-features": "off"
+  }
+}

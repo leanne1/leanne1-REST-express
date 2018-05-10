@@ -1,0 +1,7 @@
+{
+  "requestLogging": "dev",
+  "db": {
+    "name": "vidly",
+    "url": "localhost"
+  }
+}

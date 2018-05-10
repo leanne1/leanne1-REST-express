@@ -1,0 +1,12 @@
+# package
+node_modules/
+
+# Editor
+.idea/
+
+# OS
+DS_Store
+.DS_Store
+
+# Build
+build/
