@@ -1,8 +1,8 @@
 import express from 'express';
-import { debug as _debug} from 'debug';
+import { debug as _debug } from 'debug';
 import { validateObjectId, validateCustomer } from '../validators';
 import { getInvalidErrorMessages } from '../util';
-import { Customer } from '../model/customer';
+import { Customer } from '../model';
 
 const router = express.Router();
 

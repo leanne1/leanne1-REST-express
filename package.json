@@ -4,9 +4,9 @@
   "description": "Express REST service",
   "main": "index.js",
   "scripts": {
-    "start": "export DEBUG=app:* && cross-env NODE_ENV=development nodemon src/index --exec babel-node",
+    "dev": "export DEBUG=app:* && cross-env NODE_ENV=development nodemon src/index --exec babel-node",
     "build": "babel src -d build",
-    "serve": "node build/index",
+    "start": "node build/index",
     "test": "cross-env BABEL_ENV=test mocha --opts config/mocha/mocha.server.opts **/*.test.js",
     "lint": "eslint .",
     "nsp": "nsp check"
@@ -24,9 +24,11 @@
     "config": "^1.30.0",
     "debug": "^3.1.0",
     "express": "^4.16.3",
+    "fawn": "^2.1.5",
     "helmet": "^3.12.0",
     "joi": "^13.2.0",
     "joi-objectid": "^2.0.0",
+    "lodash": "^4.17.10",
     "mongoose": "^5.0.18",
     "morgan": "^1.9.0"
   },

@@ -7,6 +7,8 @@ import config from 'config';
 import mongoose from 'mongoose';
 import genre from './routes/genre';
 import customer from './routes/customer';
+import movie from './routes/movie';
+import rental from './routes/rental';
 
 const debug = _debug('app:index');
 const app = express();
@@ -16,8 +18,10 @@ const dbName = config.get('db.name');
 app.use(helmet());
 app.use(bodyParser.json());
 app.use(morgan(config.get('requestLogging')));
-app.use('/api/genre', genre);
-app.use('/api/customer', customer);
+app.use('/api/genres', genre);
+app.use('/api/customers', customer);
+app.use('/api/movies', movie);
+app.use('/api/rentals', rental);
 
 mongoose.connect(`mongodb://${dbUrl}/${dbName}`)
   .then(() => console.log(`Connected to Database ${dbName} at ${dbUrl}`))

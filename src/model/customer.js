@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import * as customer from '../constants/customer';
 
-export const Customer = mongoose.model('Customer', new mongoose.Schema({
+export const customerSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -18,4 +18,6 @@ export const Customer = mongoose.model('Customer', new mongoose.Schema({
     minlength: customer.phoneMinLength,
     maxlength: customer.phoneMaxLength,
   },
-}));
+});
+
+export const Customer = mongoose.model('Customer', customerSchema);

@@ -2,8 +2,7 @@ import express from 'express';
 import { debug as _debug} from 'debug';
 import { validateObjectId, validateGenre } from '../validators';
 import { getInvalidErrorMessages } from '../util';
-
-import { Genre } from '../model/genre';
+import { Genre } from '../model';
 
 const router = express.Router();
 
