@@ -1,19 +1,22 @@
 import express from 'express';
-import { debug as _debug} from 'debug';
+import { pick } from 'lodash';
 import { validateObjectId, validateGenre } from '../validators';
 import { getInvalidErrorMessages } from '../util';
 import { Genre } from '../model';
+import { authorize, isAdmin } from '../middleware';
 
 const router = express.Router();
 
-const createGenre = async (genre) => {
-  const newGenre = new Genre(genre);
-  return await newGenre.save();
+const getGenreInput = genre => ({ ...pick(genre, 'name') });
+
+const createGenre = genre => {
+  const newGenre = new Genre(getGenreInput(genre));
+  return newGenre.save();
 };
 
-const updateGenre = async (id, nextValues) => {
+const updateGenre = async (id, genre) => {
   return await Genre.findByIdAndUpdate(id, {
-    $set: nextValues,
+    $set: getGenreInput(genre),
   }, { new: true });
 };
 
@@ -45,7 +48,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', authorize, async (req, res) => {
   const { body } = req;
   const invalidGenre = validateGenre(body);
   if (invalidGenre) return res.status(400).send(getInvalidErrorMessages(invalidGenre));
@@ -58,7 +61,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', [authorize, isAdmin], async (req, res) => {
   const { body, params } = req;
 
   const invalidId = validateObjectId(params);
@@ -76,7 +79,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', [authorize, isAdmin], async (req, res) => {
   const { params } = req;
   const invalidId = validateObjectId(params);
 

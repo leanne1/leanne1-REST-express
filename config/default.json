@@ -3,5 +3,6 @@
   "db": {
     "name": "vidly",
     "url": "localhost"
-  }
+  },
+  "jwtPrivateKey": ""
 }

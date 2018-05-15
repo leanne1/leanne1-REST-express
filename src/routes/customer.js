@@ -1,19 +1,22 @@
 import express from 'express';
-import { debug as _debug } from 'debug';
+import { pick } from 'lodash';
 import { validateObjectId, validateCustomer } from '../validators';
 import { getInvalidErrorMessages } from '../util';
 import { Customer } from '../model';
+import { authorize, isAdmin } from '../middleware';
 
 const router = express.Router();
 
-const createCustomer = async customer => {
-  const newCustomer = await new Customer(customer);
+const getCustomerInput = customer => ({ ...pick(customer, ['name', 'isGold', 'phone']) });
+
+const createCustomer = customer => {
+  const newCustomer = new Customer(getCustomerInput(customer));
   return newCustomer.save();
 };
 
-const updateCustomer = async (id, nextValues) => {
+const updateCustomer = async (id, customer) => {
   return await Customer.findByIdAndUpdate(id, {
-    $set: nextValues,
+    $set: getCustomerInput(customer),
   }, { new: true });
 };
 
@@ -45,7 +48,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', authorize, async (req, res) => {
   const { body } = req;
 
   const invalidCustomer = validateCustomer(body);
@@ -59,7 +62,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', [authorize, isAdmin], async (req, res) => {
   const { params, body } = req;
 
   const invalidId = validateObjectId(params);
@@ -77,7 +80,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', [authorize, isAdmin], async (req, res) => {
   const { params } = req;
 
   const invalidId = validateObjectId(params);

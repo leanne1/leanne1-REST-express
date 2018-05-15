@@ -2,16 +2,16 @@ import express from 'express';
 import mongoose from 'mongoose';
 import Fawn from 'fawn';
 import { pick } from 'lodash';
-import { debug as _debug } from 'debug';
 import { validateRental } from '../validators';
 import { getInvalidErrorMessages } from '../util';
 import { Rental, Customer, Movie } from '../model';
+import { authorize } from '../middleware';
 
 const router = express.Router();
 Fawn.init(mongoose);
 
-const createRental = async (customer, movie) => {
-  return await new Rental({
+const createRental = (customer, movie) => {
+  return new Rental({
     customer: { ...pick(customer, ['_id', 'name', 'phone', 'isGold']) },
     movie: { ...pick(movie, ['_id', 'title', 'dailyRentalRate']) }
   });
@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
   return res.send(rentals);
 });
 
-router.post('/', async (req, res) => {
+router.post('/', authorize, async (req, res) => {
   const { body } = req;
 
   const invalidRental = validateRental(body);

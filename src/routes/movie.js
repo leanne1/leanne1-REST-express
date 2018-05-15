@@ -1,32 +1,25 @@
 import express from 'express';
-import { omit, pick } from 'lodash';
-import { debug as _debug } from 'debug';
+import { pick } from 'lodash';
 import { validateObjectId, validateMovie } from '../validators';
 import { getInvalidErrorMessages } from '../util';
 import { Movie, Genre } from '../model';
+import { authorize, isAdmin } from '../middleware';
 
 const router = express.Router();
 
-const createMovie = async (movie, genre) => {
-  const movieData = omit(movie, 'genreId');
-  const genreData = pick(genre, ['_id', 'name']);
+const getMovieInput = (movie, genre) => ({
+  ...pick(movie, ['title', 'numberInStock', 'dailyRentalRate']),
+  genre: { ...pick(genre, ['_id', 'name']) }
+});
 
-  const newMovie = await new Movie({
-    ...movieData,
-    genre: { ...genreData },
-  });
+const createMovie = (movie, genre) => {
+  const newMovie = new Movie(getMovieInput(movie, genre));
   return newMovie.save();
 };
 
-const updateMovie = async (id, nextMovieValues, genre) => {
-  const movieData = omit(nextMovieValues, 'genre');
-  const genreData = pick(genre, ['_id', 'name']);
-
+const updateMovie = async (id, movie, genre) => {
   return await Movie.findByIdAndUpdate(id, {
-    $set: {
-      ...movieData,
-      genre: { ... genreData }
-    },
+    $set: getMovieInput(movie, genre),
   }, { new: true });
 };
 
@@ -58,7 +51,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', authorize, async (req, res) => {
   const { body } = req;
 
   const invalidMovie = validateMovie(body);
@@ -78,7 +71,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', [authorize, isAdmin], async (req, res) => {
   const { body, params } = req;
 
   const invalidId = validateObjectId(params);
@@ -98,7 +91,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', [authorize, isAdmin], async (req, res) => {
   const { params } = req;
 
   const invalidId = validateObjectId(params);
