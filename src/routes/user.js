@@ -9,7 +9,7 @@ import { authorize } from '../middleware';
 const router = express.Router();
 
 const getUserInput = (user, password) => ({
-  ...pick(user, ['name', 'email', 'roles']),
+  ...pick(user, ['name', 'email']),
   password
 });
 
@@ -42,7 +42,7 @@ router.post('/', async (req, res) => {
     // Login in newly-registered user
     const authToken = user.generateAuthToken();
     return res.send({
-      ...pick(user, ['name', 'email', '_id', 'roles']),
+      ...pick(user, ['name', 'email', '_id']),
       access_token: authToken,
     });
   } catch (err) {
