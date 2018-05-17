@@ -2,7 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import Fawn from 'fawn';
 import { pick } from 'lodash';
-import { validateRental } from '../validators';
+import { validateRental } from '../validate';
 import { getInvalidErrorMessages } from '../util';
 import { Rental, Customer, Movie } from '../model';
 import { authorize, attemptAsync } from '../middleware';

@@ -1,6 +1,6 @@
 import express from 'express';
 import { pick } from 'lodash';
-import { validateObjectId, validateGenre } from '../validators';
+import { validateObjectId, validateGenre } from '../validate';
 import { getInvalidErrorMessages } from '../util';
 import { Genre } from '../model';
 import { authorize, isAdmin, attemptAsync } from '../middleware';

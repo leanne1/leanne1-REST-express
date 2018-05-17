@@ -1,6 +1,6 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
-import { validateAuth } from '../validators';
+import { validateAuth } from '../validate';
 import { getInvalidErrorMessages } from '../util';
 import { User } from '../model';
 import { attemptAsync } from '../middleware';

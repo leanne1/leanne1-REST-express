@@ -1,7 +1,7 @@
 import express from 'express';
 import { pick, get } from 'lodash';
 import bcrypt from 'bcrypt';
-import { validateUser } from '../validators';
+import { validateUser } from '../validate';
 import { getInvalidErrorMessages } from '../util';
 import { User } from '../model';
 import { authorize, attemptAsync } from '../middleware';
