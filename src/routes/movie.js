@@ -3,7 +3,7 @@ import { pick } from 'lodash';
 import { validateObjectId, validateMovie } from '../validators';
 import { getInvalidErrorMessages } from '../util';
 import { Movie, Genre } from '../model';
-import { authorize, isAdmin } from '../middleware';
+import { authorize, isAdmin, attemptAsync } from '../middleware';
 
 const router = express.Router();
 
@@ -27,31 +27,23 @@ const deleteMovie = async id => {
   return await Movie.findByIdAndRemove(id)
 };
 
-router.get('/', async (req, res) => {
+router.get('/', attemptAsync(async (req, res) => {
   const movies = await Movie.find();
-  try {
-    return res.send(movies);
-  } catch(err) {
-    return res.status(500).send(err.message);
-  }
-});
+  return res.send(movies);
+}));
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', attemptAsync(async (req, res) => {
   const { params } = req;
 
   const invalidId = validateObjectId(params);
   if (invalidId) return res.status(400).send(getInvalidErrorMessages(invalidId));
 
-  try {
-    const movie = await Movie.findById(params.id);
-    if (!movie) return res.status(404).send('Movie not found');
-    return res.send(movie);
-  } catch(err) {
-    return res.status(500).send(err.message);
-  }
-});
+  const movie = await Movie.findById(params.id);
+  if (!movie) return res.status(404).send('Movie not found');
+  return res.send(movie);
+}));
 
-router.post('/', authorize, async (req, res) => {
+router.post('/', authorize, attemptAsync(async (req, res) => {
   const { body } = req;
 
   const invalidMovie = validateMovie(body);
@@ -60,18 +52,14 @@ router.post('/', authorize, async (req, res) => {
   const invalidGenreId = validateObjectId({ id: body.genreId });
   if (invalidGenreId) return res.status(400).send(getInvalidErrorMessages(invalidGenreId));
 
-  try {
-    const genre = await Genre.findById(body.genreId);
-    if (!genre) return res.status(400).send('Invalid genre');
+  const genre = await Genre.findById(body.genreId);
+  if (!genre) return res.status(400).send('Invalid genre');
 
-    const movie = await createMovie(body, genre);
-    return res.send(movie);
-  } catch (err) {
-    return res.status(500).send(err.message);
-  }
-});
+  const movie = await createMovie(body, genre);
+  return res.send(movie);
+}));
 
-router.put('/:id', [authorize, isAdmin], async (req, res) => {
+router.put('/:id', [authorize, isAdmin], attemptAsync(async (req, res) => {
   const { body, params } = req;
 
   const invalidId = validateObjectId(params);
@@ -80,30 +68,22 @@ router.put('/:id', [authorize, isAdmin], async (req, res) => {
   const invalidMovie = validateMovie(body);
   if (invalidMovie) return res.status(400).send(getInvalidErrorMessages(invalidMovie));
 
-  try {
-    const genre = await Genre.findById(body.genreId);
-    if (!genre) return res.status(400).send('Invalid genre');
+  const genre = await Genre.findById(body.genreId);
+  if (!genre) return res.status(400).send('Invalid genre');
 
-    const movie = await updateMovie(params.id, body, genre);
-    return res.send(movie);
-  } catch (err) {
-    return res.status(500).send(err.message);
-  }
-});
+  const movie = await updateMovie(params.id, body, genre);
+  return res.send(movie);
+}));
 
-router.delete('/:id', [authorize, isAdmin], async (req, res) => {
+router.delete('/:id', [authorize, isAdmin], attemptAsync(async (req, res) => {
   const { params } = req;
 
   const invalidId = validateObjectId(params);
   if (invalidId) return res.status(400).send(getInvalidErrorMessages(invalidId));
 
-  try {
-    const movie = await deleteMovie(params.id);
-    if (!movie) return res.status(404).send('Movie not found');
-    return res.send(200);
-  } catch (err) {
-    return res.status(500).send(err.message);
-  }
-});
+  const movie = await deleteMovie(params.id);
+  if (!movie) return res.status(404).send('Movie not found');
+  return res.send(200);
+}));
 
 export default router;

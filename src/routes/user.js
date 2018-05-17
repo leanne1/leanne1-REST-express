@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import { validateUser } from '../validators';
 import { getInvalidErrorMessages } from '../util';
 import { User } from '../model';
-import { authorize } from '../middleware';
+import { authorize, attemptAsync } from '../middleware';
 
 const router = express.Router();
 
@@ -28,7 +28,7 @@ router.get('/me', authorize, async(req, res) => {
   return res.send(currentUser)
 });
 
-router.post('/', async (req, res) => {
+router.post('/', attemptAsync(async (req, res) => {
   const { body } = req;
   const invalidUser = validateUser(body);
   if (invalidUser) return res.status(400).send(getInvalidErrorMessages(invalidUser));
@@ -36,18 +36,14 @@ router.post('/', async (req, res) => {
   const hasUser = await User.findOne({ email: body.email });
   if (hasUser) return res.status(400).send('User already registered');
 
-  try {
-    const hashedPassword = await getHashedPassword(get(body, 'password'));
-    const user = await createUser(body, hashedPassword);
-    // Login in newly-registered user
-    const authToken = user.generateAuthToken();
-    return res.send({
-      ...pick(user, ['name', 'email', '_id']),
-      access_token: authToken,
-    });
-  } catch (err) {
-    return res.status(500).send(err.message);
-  }
-});
+  const hashedPassword = await getHashedPassword(get(body, 'password'));
+  const user = await createUser(body, hashedPassword);
+  // Login in newly-registered user
+  const authToken = user.generateAuthToken();
+  return res.send({
+    ...pick(user, ['name', 'email', '_id']),
+    access_token: authToken,
+  });
+}));
 
 export default router;

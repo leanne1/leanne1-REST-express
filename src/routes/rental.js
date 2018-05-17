@@ -5,7 +5,7 @@ import { pick } from 'lodash';
 import { validateRental } from '../validators';
 import { getInvalidErrorMessages } from '../util';
 import { Rental, Customer, Movie } from '../model';
-import { authorize } from '../middleware';
+import { authorize, attemptAsync } from '../middleware';
 
 const router = express.Router();
 Fawn.init(mongoose);
@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
   return res.send(rentals);
 });
 
-router.post('/', authorize, async (req, res) => {
+router.post('/', authorize, attemptAsync(async (req, res) => {
   const { body } = req;
 
   const invalidRental = validateRental(body);
@@ -36,20 +36,16 @@ router.post('/', authorize, async (req, res) => {
 
   if (movie.numberInStock === 0) return res.status(400).send('Movie not in stock');
 
-  try {
-    const rental = await createRental(customer, movie);
-    new Fawn.Task()
-      .save('rentals', rental)
-      .update('movies', { _id: movie._id }, {
-        $inc: {
-          numberInStock: -1
-        }
-      })
-      .run();
-    return res.send(rental);
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
+  const rental = await createRental(customer, movie);
+  new Fawn.Task()
+    .save('rentals', rental)
+    .update('movies', { _id: movie._id }, {
+      $inc: {
+        numberInStock: -1
+      }
+    })
+    .run();
+  return res.send(rental);
+}));
 
 export default router;
