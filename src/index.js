@@ -10,7 +10,8 @@ import { connectToDb } from './db';
 import { handleExceptions } from './log';
 import { useRoutes } from './routes';
 import { handleError } from './middleware';
-import { verifyConfig, httpsOptions } from './config';
+import { verifyConfig } from './config';
+import { httpsOptions } from './config/https';
 
 const app = express();
 const appConfig = [

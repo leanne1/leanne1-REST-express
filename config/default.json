@@ -4,5 +4,5 @@
     "name": "vidly",
     "url": "localhost"
   },
-  "jwtPrivateKey": ""
+  "jwtPrivateKey": "secret"
 }
