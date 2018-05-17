@@ -24,6 +24,6 @@ REST API built with Express and MongoDB
 - `/customers/:id`, `GET, POST, PUT, DELETE`
 - `/rentals/` `GET, POST`
 
-- Use Mongo Compass to update a user's roleto include `admin` before re-authenticating  for
+- Use Mongo Compass to update a user's role to include `admin` before re-authenticating  for
 `PUT` and `DELETE` requests
 - Request body validation errors will provide required request body keys
