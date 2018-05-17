@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import https from 'https';
 import express from 'express';
 import helmet from 'helmet';
 import bodyParser from 'body-parser';
@@ -9,7 +10,7 @@ import { connectToDb } from './db';
 import { handleExceptions } from './log';
 import { useRoutes } from './routes';
 import { handleError } from './middleware';
-import { verifyConfig } from './config';
+import { verifyConfig, httpsOptions } from './config';
 
 const app = express();
 
@@ -24,7 +25,8 @@ useRoutes(app);
 app.use(handleError);
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  winston.info(`Starting app in env ${process.env.NODE_ENV}`);
-  winston.info(`Listening on port ${port}`);
+https.createServer(httpsOptions, app).listen(port, () => {
+  winston.info(
+    `Starting app in env ${process.env.NODE_ENV}, listening on port ${port}, using HTTPS`
+  );
 });
