@@ -4,13 +4,16 @@
   "description": "Express REST service",
   "main": "index.js",
   "env": {
-     "dev": "development"
+    "dev": "development"
   },
   "scripts": {
+    "mocha": "cross-env BABEL_ENV=test mocha --require babel-register config/mocha/setup.test.js --opts config/mocha/mocha.server.opts src/**/*.test.js",
     "dev": "export APP_ENV=$npm_package_env_dev DEBUG=app:* && cross-env NODE_ENV=$npm_package_env_dev nodemon src/index --exec babel-node",
     "build": "babel src -d build",
     "start": "node build/index",
-    "test": "cross-env BABEL_ENV=test mocha --opts config/mocha/mocha.server.opts **/*.test.js",
+    "test": "npm run mocha",
+    "tdd": "npm run mocha -- -watch",
+    "test:coverage": "nyc npm run mocha && nyc report --reporter=lcov",
     "lint": "eslint .",
     "nsp": "nsp check"
   },
@@ -56,6 +59,7 @@
     "mocha": "^5.1.1",
     "nodemon": "^1.17.3",
     "nsp": "^3.2.1",
+    "nyc": "^11.8.0",
     "pre-push": "^0.1.1",
     "sinon": "^5.0.7"
   }
