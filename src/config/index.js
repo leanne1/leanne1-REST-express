@@ -1,13 +1,7 @@
-import fs from 'fs';
-import config from 'config';
+export { httpsOptions } from './https';
 
-export const verifyConfig = () => {
-  if (!config.get('jwtPrivateKey')) {
-    throw new Error('jwtPrivateKey is not defined');
-  }
-};
-
-export const httpsOptions = {
-  key: fs.readFileSync('vidly.pem'),
-  cert: fs.readFileSync('vidly.crt'),
+export const verifyConfig = ([...config]) => {
+  config.forEach(c => {
+    if (!c.config) throw new Error(`${c.name} config is not defined`);
+  });
 };

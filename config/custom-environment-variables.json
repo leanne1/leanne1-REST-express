@@ -1,3 +1,4 @@
 {
-  "jwtPrivateKey": "vidly_jwtPrivateKey"
+  "jwtPrivateKey": "vidly_jwtPrivateKey",
+  "app_env": "APP_ENV"
 }

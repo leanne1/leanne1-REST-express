@@ -13,9 +13,13 @@ import { handleError } from './middleware';
 import { verifyConfig, httpsOptions } from './config';
 
 const app = express();
+const appConfig = [
+  { config: httpsOptions, name: 'httpsOptions' },
+  { config: config.get('jwtPrivateKey'), name: 'jwtPrivateKey' },
+];
 
 handleExceptions();
-verifyConfig();
+verifyConfig(appConfig);
 connectToDb();
 
 app.use(helmet());

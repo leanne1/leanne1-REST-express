@@ -3,8 +3,11 @@
   "version": "0.0.0",
   "description": "Express REST service",
   "main": "index.js",
+  "env": {
+     "dev": "development"
+  },
   "scripts": {
-    "dev": "export DEBUG=app:* && cross-env NODE_ENV=development nodemon src/index --exec babel-node",
+    "dev": "export APP_ENV=$npm_package_env_dev DEBUG=app:* && cross-env NODE_ENV=$npm_package_env_dev nodemon src/index --exec babel-node",
     "build": "babel src -d build",
     "start": "node build/index",
     "test": "cross-env BABEL_ENV=test mocha --opts config/mocha/mocha.server.opts **/*.test.js",
@@ -23,7 +26,6 @@
     "bcrypt": "^2.0.1",
     "body-parser": "^1.18.2",
     "config": "^1.30.0",
-    "debug": "^3.1.0",
     "express": "^4.16.3",
     "fawn": "^2.1.5",
     "helmet": "^3.12.0",
@@ -44,13 +46,17 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-stage-0": "^6.24.1",
     "babel-register": "^6.26.0",
+    "chai": "^4.1.2",
     "cross-env": "^5.1.4",
+    "debug": "^3.1.0",
+    "dirty-chai": "^2.0.1",
     "eslint": "^4.19.1",
     "eslint-plugin-import": "^2.11.0",
     "eslint-plugin-node": "^6.0.1",
     "mocha": "^5.1.1",
     "nodemon": "^1.17.3",
     "nsp": "^3.2.1",
-    "pre-push": "^0.1.1"
+    "pre-push": "^0.1.1",
+    "sinon": "^5.0.7"
   }
 }
