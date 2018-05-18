@@ -110,7 +110,7 @@ describe(colors.yellow.bold('@Integration - api - /genres'), () => {
     });
   });
 
-  describe(colors.cyan.bold('PUT'),() => {
+  describe(colors.cyan.bold('PUT /:id'),() => {
     it('should return a 403 if client is not authorized with role admin', async () => {
       const newGenre = await new Genre(genre).save();
       const res = await request(app)
@@ -168,7 +168,7 @@ describe(colors.yellow.bold('@Integration - api - /genres'), () => {
     });
   });
 
-  describe(colors.cyan.bold('DELETE'),() => {
+  describe(colors.cyan.bold('DELETE /:id'),() => {
     it('should return a 403 if client is not authorized with role admin', async () => {
       const newGenre = await new Genre(genre).save();
       const res = await request(app)
