@@ -4,6 +4,6 @@ import { authEmail, authPassword } from './common';
 
 export const userSchema = Joi.object({
   name: Joi.string().min(user.nameMinLength).max(user.nameMaxLength).required(),
-  email: authEmail,
-  password: authPassword,
+  email: authEmail.required(),
+  password: authPassword.required(),
 }).unknown(false);

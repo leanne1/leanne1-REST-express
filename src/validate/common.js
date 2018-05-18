@@ -17,7 +17,6 @@ export const authEmail =
   Joi.string()
     .min(user.emailMinLength)
     .max(common.stringMaxLength)
-    .email()
-    .required();
+    .email();
 
-export const authPassword = new PasswordComplexity(passwordComplexity).required();
+export const authPassword = new PasswordComplexity(passwordComplexity);

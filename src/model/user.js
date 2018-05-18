@@ -29,11 +29,11 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-userSchema.methods.generateAuthToken = function() {
+userSchema.methods.generateAuthToken = function(key = config.get('jwtPrivateKey')) {
   return jwt.sign({
     _id: this._id,
     roles: this.roles,
-  }, config.get('jwtPrivateKey'));
+  }, key);
 };
 
 export const User = mongoose.model('User', userSchema);

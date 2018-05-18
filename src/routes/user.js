@@ -23,13 +23,14 @@ const getHashedPassword = async password => {
   return bcrypt.hash(password, salt);
 };
 
-router.get('/me', authorize, async(req, res) => {
+router.get('/me', authorize, attemptAsync(async(req, res) => {
   const currentUser = await User.findById(req.user._id).select('-password');
   return res.send(currentUser)
-});
+}));
 
 router.post('/', attemptAsync(async (req, res) => {
   const { body } = req;
+
   const invalidUser = validateUser(body);
   if (invalidUser) return res.status(400).send(getInvalidErrorMessages(invalidUser));
 

@@ -17,10 +17,10 @@ const createRental = (customer, movie) => {
   });
 };
 
-router.get('/', async (req, res) => {
+router.get('/', attemptAsync(async (req, res) => {
   const rentals = await Rental.find().sort('-dateOut');
   return res.send(rentals);
-});
+}));
 
 router.post('/', authorize, attemptAsync(async (req, res) => {
   const { body } = req;

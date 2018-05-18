@@ -1,6 +1,6 @@
 import { verifyConfig } from './index';
 
-describe('config - verifyConfig()', () => {
+describe('Config - verifyConfig()', () => {
   it('throws if config is falsey', () => {
     const config = [{ config: null, name: 'Missing' }];
     try {
