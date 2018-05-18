@@ -30,7 +30,7 @@ useRoutes(app);
 app.use(handleError);
 
 const port = process.env.PORT || 3000;
-https.createServer(httpsOptions, app).listen(port, () => {
+export const server = https.createServer(httpsOptions, app).listen(port, () => {
   winston.info(
     `Starting app in env ${process.env.NODE_ENV}, listening on port ${port}, using HTTPS`
   );

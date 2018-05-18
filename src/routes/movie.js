@@ -3,7 +3,12 @@ import { pick } from 'lodash';
 import { validateObjectId, validateMovie } from '../validate';
 import { getInvalidErrorMessages } from '../util';
 import { Movie, Genre } from '../model';
-import { authorize, isAdmin, attemptAsync } from '../middleware';
+import {
+  authorize,
+  isAdmin,
+  attemptAsync,
+  validObjectId
+} from '../middleware';
 
 const router = express.Router();
 
@@ -32,18 +37,13 @@ router.get('/', attemptAsync(async (req, res) => {
   return res.send(movies);
 }));
 
-router.get('/:id', attemptAsync(async (req, res) => {
-  const { params } = req;
-
-  const invalidId = validateObjectId(params);
-  if (invalidId) return res.status(400).send(getInvalidErrorMessages(invalidId));
-
-  const movie = await Movie.findById(params.id);
+router.get('/:id', [validObjectId], attemptAsync(async (req, res) => {
+  const movie = await Movie.findById(req.params.id);
   if (!movie) return res.status(404).send('Movie not found');
   return res.send(movie);
 }));
 
-router.post('/', authorize, attemptAsync(async (req, res) => {
+router.post('/', [authorize], attemptAsync(async (req, res) => {
   const { body } = req;
 
   const invalidMovie = validateMovie(body);
@@ -59,11 +59,8 @@ router.post('/', authorize, attemptAsync(async (req, res) => {
   return res.send(movie);
 }));
 
-router.put('/:id', [authorize, isAdmin], attemptAsync(async (req, res) => {
+router.put('/:id', [authorize, isAdmin, validObjectId], attemptAsync(async (req, res) => {
   const { body, params } = req;
-
-  const invalidId = validateObjectId(params);
-  if (invalidId) return res.status(400).send(getInvalidErrorMessages(invalidId));
 
   const invalidMovie = validateMovie(body);
   if (invalidMovie) return res.status(400).send(getInvalidErrorMessages(invalidMovie));
@@ -75,13 +72,8 @@ router.put('/:id', [authorize, isAdmin], attemptAsync(async (req, res) => {
   return res.send(movie);
 }));
 
-router.delete('/:id', [authorize, isAdmin], attemptAsync(async (req, res) => {
-  const { params } = req;
-
-  const invalidId = validateObjectId(params);
-  if (invalidId) return res.status(400).send(getInvalidErrorMessages(invalidId));
-
-  const movie = await deleteMovie(params.id);
+router.delete('/:id', [authorize, isAdmin, validObjectId], attemptAsync(async (req, res) => {
+  const movie = await deleteMovie(req.params.id);
   if (!movie) return res.status(404).send('Movie not found');
   return res.send(200);
 }));

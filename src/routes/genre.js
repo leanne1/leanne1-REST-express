@@ -1,9 +1,14 @@
 import express from 'express';
 import { pick } from 'lodash';
-import { validateObjectId, validateGenre } from '../validate';
+import { validateGenre } from '../validate';
 import { getInvalidErrorMessages } from '../util';
 import { Genre } from '../model';
-import { authorize, isAdmin, attemptAsync } from '../middleware';
+import {
+  authorize,
+  isAdmin,
+  attemptAsync,
+  validObjectId
+} from '../middleware';
 
 const router = express.Router();
 
@@ -29,19 +34,16 @@ router.get('/', attemptAsync(async (req, res) => {
   res.send(genres);
 }));
 
-router.get('/:id', attemptAsync(async (req, res) => {
-  const { params } = req;
-  const invalidId = validateObjectId(params);
-
-  if (invalidId) return res.status(400).send(getInvalidErrorMessages(invalidId));
-
-  const genre = await Genre.findById(params.id);
+router.get('/:id', [validObjectId], attemptAsync(async (req, res) => {
+  const genre = await Genre.findById(req.params.id);
   if (!genre) return res.status(404).send('Genre not found');
+
   res.send(genre);
 }));
 
 router.post('/', authorize, attemptAsync(async (req, res) => {
   const { body } = req;
+
   const invalidGenre = validateGenre(body);
   if (invalidGenre) return res.status(400).send(getInvalidErrorMessages(invalidGenre));
 
@@ -49,11 +51,8 @@ router.post('/', authorize, attemptAsync(async (req, res) => {
   return res.send(genre);
 }));
 
-router.put('/:id', [authorize, isAdmin], attemptAsync(async (req, res) => {
+router.put('/:id', [authorize, isAdmin, validObjectId], attemptAsync(async (req, res) => {
   const { body, params } = req;
-
-  const invalidId = validateObjectId(params);
-  if (invalidId) return res.status(400).send(getInvalidErrorMessages(invalidId));
 
   const invalidGenre = validateGenre(body);
   if (invalidGenre) return res.status(400).send(getInvalidErrorMessages(invalidGenre));
@@ -63,13 +62,8 @@ router.put('/:id', [authorize, isAdmin], attemptAsync(async (req, res) => {
   return res.send(genre);
 }));
 
-router.delete('/:id', [authorize, isAdmin], attemptAsync(async (req, res) => {
-  const { params } = req;
-  const invalidId = validateObjectId(params);
-
-  if (invalidId) return res.status(400).send(getInvalidErrorMessages(invalidId));
-
-  const genre = await deleteGenre(params.id);
+router.delete('/:id', [authorize, isAdmin, validObjectId], attemptAsync(async (req, res) => {
+  const genre = await deleteGenre(req.params.id);
   if (!genre) return res.status(404).send('Genre not found');
   return res.send(200);
 }));

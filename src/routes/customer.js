@@ -1,9 +1,14 @@
 import express from 'express';
 import { pick } from 'lodash';
-import { validateObjectId, validateCustomer } from '../validate';
+import { validateCustomer } from '../validate';
 import { getInvalidErrorMessages } from '../util';
 import { Customer } from '../model';
-import { authorize, isAdmin, attemptAsync } from '../middleware';
+import {
+  authorize,
+  isAdmin,
+  attemptAsync,
+  validObjectId
+} from '../middleware';
 
 const router = express.Router();
 
@@ -29,19 +34,14 @@ router.get('/', attemptAsync(async (req, res) => {
   return res.send(customers);
 }));
 
-router.get('/:id', attemptAsync(async (req, res) => {
-  const { params } = req;
-
-  const invalidId = validateObjectId(params);
-  if (invalidId) return res.status(400).send(getInvalidErrorMessages(invalidId));
-
-  const customer = await Customer.findById(params.id);
+router.get('/:id', [validObjectId], attemptAsync(async (req, res) => {
+  const customer = await Customer.findById(req.params.id);
   if (!customer) return res.status(404).send('Customer not found');
   return res.send(customer);
 
 }));
 
-router.post('/', authorize, attemptAsync(async (req, res) => {
+router.post('/', [authorize], attemptAsync(async (req, res) => {
   const { body } = req;
 
   const invalidCustomer = validateCustomer(body);
@@ -51,11 +51,8 @@ router.post('/', authorize, attemptAsync(async (req, res) => {
   return res.send(customer);
 }));
 
-router.put('/:id', [authorize, isAdmin], attemptAsync(async (req, res) => {
+router.put('/:id', [authorize, isAdmin, validObjectId], attemptAsync(async (req, res) => {
   const { params, body } = req;
-
-  const invalidId = validateObjectId(params);
-  if (invalidId) return res.status(400).send(getInvalidErrorMessages(invalidId));
 
   const invalidCustomer = validateCustomer(body);
   if (invalidCustomer) return res.status(400).send(getInvalidErrorMessages(invalidCustomer));
@@ -65,13 +62,8 @@ router.put('/:id', [authorize, isAdmin], attemptAsync(async (req, res) => {
   return res.send(customer);
 }));
 
-router.delete('/:id', [authorize, isAdmin], attemptAsync(async (req, res) => {
-  const { params } = req;
-
-  const invalidId = validateObjectId(params);
-  if (invalidId) return res.status(400).send(getInvalidErrorMessages(invalidId));
-
-  const customer = await deleteCustomer(params.id);
+router.delete('/:id', [authorize, isAdmin, validObjectId], attemptAsync(async (req, res) => {
+  const customer = await deleteCustomer(req.params.id);
   if (!customer) return res.status(404).send('Customer not found');
   return res.send(200);
 }));

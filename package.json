@@ -5,17 +5,18 @@
   "main": "index.js",
   "config": {
     "env": {
-      "dev": "development"
+      "dev": "development",
+      "test": "test"
     }
   },
   "scripts": {
-    "mocha": "cross-env BABEL_ENV=test mocha --require babel-register config/mocha/setup.test.js --opts config/mocha/mocha.server.opts src/**/*.test.js",
+    "mocha": "cross-env PORT=3001 NODE_ENV=$npm_package_config_env_test NODE_TLS_REJECT_UNAUTHORIZED=0 APP_ENV=$npm_package_config_env_dev BABEL_ENV=test mocha --require babel-register config/mocha/setup.test.js --opts config/mocha/mocha.server.opts src/**/*.test.js",
     "dev": "cross-env NODE_ENV=$npm_package_config_env_dev APP_ENV=$npm_package_config_env_dev DEBUG=app:* nodemon src/index --exec babel-node",
     "build": "babel src -d build",
     "start": "node build/index",
-    "test": "npm run mocha",
+    "test": "npm run mocha -- --exit",
     "tdd": "nodemon --exec npm run mocha -- -watch",
-    "test:coverage": "nyc npm run mocha && nyc report --reporter=lcov",
+    "test:coverage": "nyc npm run mocha -- --exit && nyc report --reporter=lcov",
     "lint": "eslint .",
     "nsp": "nsp check"
   },
@@ -52,6 +53,7 @@
     "babel-preset-stage-0": "^6.24.1",
     "babel-register": "^6.26.0",
     "chai": "^4.1.2",
+    "colors": "^1.2.5",
     "cross-env": "^5.1.4",
     "debug": "^3.1.0",
     "dirty-chai": "^2.0.1",
@@ -63,6 +65,7 @@
     "nsp": "^3.2.1",
     "nyc": "^11.8.0",
     "pre-push": "^0.1.1",
-    "sinon": "^5.0.7"
+    "sinon": "^5.0.7",
+    "supertest": "^3.1.0"
   }
 }
