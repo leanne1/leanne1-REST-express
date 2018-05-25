@@ -2,6 +2,7 @@
 import https from 'https';
 import express from 'express';
 import helmet from 'helmet';
+import compression from 'compression';
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import winston from 'winston';
@@ -24,6 +25,7 @@ verifyConfig(appConfig);
 connectToDb();
 
 app.use(helmet());
+app.use(compression());
 app.use(bodyParser.json());
 app.use(morgan(config.get('requestLogging')));
 useRoutes(app);
