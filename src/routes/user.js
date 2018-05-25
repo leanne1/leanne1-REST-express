@@ -2,9 +2,8 @@ import express from 'express';
 import { pick, get } from 'lodash';
 import bcrypt from 'bcrypt';
 import { validateUser } from '../validate';
-import { getInvalidErrorMessages } from '../util';
 import { User } from '../model';
-import { authorize, attemptAsync } from '../middleware';
+import { authorize, attemptAsync, validateBody } from '../middleware';
 
 const router = express.Router();
 
@@ -28,11 +27,8 @@ router.get('/me', authorize, attemptAsync(async(req, res) => {
   return res.send(currentUser)
 }));
 
-router.post('/', attemptAsync(async (req, res) => {
+router.post('/', validateBody(validateUser), attemptAsync(async (req, res) => {
   const { body } = req;
-
-  const invalidUser = validateUser(body);
-  if (invalidUser) return res.status(400).send(getInvalidErrorMessages(invalidUser));
 
   const hasUser = await User.findOne({ email: body.email });
   if (hasUser) return res.status(400).send('User already registered');

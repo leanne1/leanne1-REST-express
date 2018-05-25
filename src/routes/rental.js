@@ -3,9 +3,8 @@ import mongoose from 'mongoose';
 import Fawn from 'fawn';
 import { pick } from 'lodash';
 import { validateRental } from '../validate';
-import { getInvalidErrorMessages } from '../util';
 import { Rental, Customer, Movie } from '../model';
-import { authorize, attemptAsync } from '../middleware';
+import { authorize, attemptAsync, validateBody } from '../middleware';
 
 const router = express.Router();
 Fawn.init(mongoose);
@@ -22,11 +21,8 @@ router.get('/', attemptAsync(async (req, res) => {
   return res.send(rentals);
 }));
 
-router.post('/', authorize, attemptAsync(async (req, res) => {
+router.post('/', [authorize, validateBody(validateRental)], attemptAsync(async (req, res) => {
   const { body } = req;
-
-  const invalidRental = validateRental(body);
-  if (invalidRental) return res.status(400).send(getInvalidErrorMessages(invalidRental));
 
   const customer = await Customer.findById(body.customerId);
   if (!customer) return res.status(400).send('Invalid customer');

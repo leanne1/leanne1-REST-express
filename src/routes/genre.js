@@ -1,13 +1,13 @@
 import express from 'express';
 import { pick } from 'lodash';
 import { validateGenre } from '../validate';
-import { getInvalidErrorMessages } from '../util';
 import { Genre } from '../model';
 import {
   authorize,
   isAdmin,
   attemptAsync,
-  validObjectId
+  validObjectIdParam,
+  validateBody,
 } from '../middleware';
 
 const router = express.Router();
@@ -34,35 +34,30 @@ router.get('/', attemptAsync(async (req, res) => {
   res.send(genres);
 }));
 
-router.get('/:id', [validObjectId], attemptAsync(async (req, res) => {
+router.get('/:id', validObjectIdParam, attemptAsync(async (req, res) => {
   const genre = await Genre.findById(req.params.id);
   if (!genre) return res.status(404).send('Genre not found');
 
   res.send(genre);
 }));
 
-router.post('/', authorize, attemptAsync(async (req, res) => {
-  const { body } = req;
-
-  const invalidGenre = validateGenre(body);
-  if (invalidGenre) return res.status(400).send(getInvalidErrorMessages(invalidGenre));
-
-  const genre = await createGenre(body);
+router.post('/', [authorize, validateBody(validateGenre)], attemptAsync(async (req, res) => {
+  const genre = await createGenre(req.body);
   return res.send(genre);
 }));
 
-router.put('/:id', [authorize, isAdmin, validObjectId], attemptAsync(async (req, res) => {
-  const { body, params } = req;
-
-  const invalidGenre = validateGenre(body);
-  if (invalidGenre) return res.status(400).send(getInvalidErrorMessages(invalidGenre));
-
-  const genre = await updateGenre(params.id, body);
+router.put('/:id', [
+  authorize,
+  isAdmin,
+  validObjectIdParam,
+  validateBody(validateGenre)
+], attemptAsync(async (req, res) => {
+  const genre = await updateGenre(req.params.id, req.body);
   if (!genre) return res.status(404).send('Genre not found');
   return res.send(genre);
 }));
 
-router.delete('/:id', [authorize, isAdmin, validObjectId], attemptAsync(async (req, res) => {
+router.delete('/:id', [authorize, isAdmin, validObjectIdParam], attemptAsync(async (req, res) => {
   const genre = await deleteGenre(req.params.id);
   if (!genre) return res.status(404).send('Genre not found');
   return res.send(200);

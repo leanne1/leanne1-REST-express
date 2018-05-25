@@ -1,13 +1,13 @@
 import express from 'express';
 import { pick } from 'lodash';
 import { validateCustomer } from '../validate';
-import { getInvalidErrorMessages } from '../util';
 import { Customer } from '../model';
 import {
   authorize,
   isAdmin,
   attemptAsync,
-  validObjectId
+  validObjectIdParam,
+  validateBody
 } from '../middleware';
 
 const router = express.Router();
@@ -34,35 +34,29 @@ router.get('/', attemptAsync(async (req, res) => {
   return res.send(customers);
 }));
 
-router.get('/:id', [validObjectId], attemptAsync(async (req, res) => {
+router.get('/:id', [validObjectIdParam], attemptAsync(async (req, res) => {
   const customer = await Customer.findById(req.params.id);
   if (!customer) return res.status(404).send('Customer not found');
   return res.send(customer);
-
 }));
 
-router.post('/', [authorize], attemptAsync(async (req, res) => {
-  const { body } = req;
-
-  const invalidCustomer = validateCustomer(body);
-  if (invalidCustomer) return res.status(400).send(getInvalidErrorMessages(invalidCustomer));
-
-  const customer = await createCustomer(body);
+router.post('/', [authorize, validateBody(validateCustomer)], attemptAsync(async (req, res) => {
+  const customer = await createCustomer(req.body);
   return res.send(customer);
 }));
 
-router.put('/:id', [authorize, isAdmin, validObjectId], attemptAsync(async (req, res) => {
-  const { params, body } = req;
-
-  const invalidCustomer = validateCustomer(body);
-  if (invalidCustomer) return res.status(400).send(getInvalidErrorMessages(invalidCustomer));
-
-  const customer = await updateCustomer(params.id, body);
+router.put('/:id', [
+  authorize,
+  isAdmin,
+  validObjectIdParam,
+  validateBody(validateCustomer)
+], attemptAsync(async (req, res) => {
+  const customer = await updateCustomer(req.params.id, req.body);
   if (!customer) res.status(404).send('Customer not found');
   return res.send(customer);
 }));
 
-router.delete('/:id', [authorize, isAdmin, validObjectId], attemptAsync(async (req, res) => {
+router.delete('/:id', [authorize, isAdmin, validObjectIdParam], attemptAsync(async (req, res) => {
   const customer = await deleteCustomer(req.params.id);
   if (!customer) return res.status(404).send('Customer not found');
   return res.send(200);

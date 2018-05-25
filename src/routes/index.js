@@ -4,6 +4,7 @@ import movie from './movie';
 import rental from './rental';
 import user from './user';
 import auth from './auth';
+import returns from './returns'
 
 export const useRoutes = app => {
   app.use('/api/genres', genre);
@@ -12,4 +13,5 @@ export const useRoutes = app => {
   app.use('/api/rentals', rental);
   app.use('/api/users', user);
   app.use('/api/auth', auth);
+  app.use('/api/returns', returns);
 };

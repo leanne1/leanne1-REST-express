@@ -1,4 +1,5 @@
 import request from 'supertest';
+import { getUserAuthToken, getAdminAuthToken } from '../../test/helpers';
 import { Genre, User } from '../model/index';
 import { genres, genre } from './fixtures/input/genre';
 
@@ -12,24 +13,12 @@ describe(colors.yellow.bold('@Integration - api - /genres'), () => {
 
   beforeEach(async () => {
     app = require('../index').server;
-    const user = await new User({
-      email: 'user@user.com',
-      password: 'Foobarbaz1',
-      name: 'foo'
-    }).save();
-    authToken = user.generateAuthToken('secret');
-
-    const adminUser = await new User({
-      email: 'admin@admin.com',
-      password: 'Foobarbaz1',
-      name: 'foo',
-      roles: ['admin']
-    }).save();
-    adminAuthToken = adminUser.generateAuthToken('secret');
+    authToken = await getUserAuthToken();
+    adminAuthToken = await getAdminAuthToken();
   });
 
   afterEach(async () => {
-    app.close();
+    await app.close();
     await Genre.remove({});
     await User.remove({});
     authToken = null;
